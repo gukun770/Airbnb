@@ -1,0 +1,85 @@
+<html>
+<!-- What the page is called in the tab bar  -->
+<!-- We will add out stylsheet here later -->
+<head>
+    <link rel="stylesheet" href="/static/home.css" />
+    <title> Home Page</title>
+</head>
+<!-- Put some text on the page -->
+<body>
+        <img src="https://a0.muscache.com/airbnb/static/logos/belo-200x200-4d851c5b28f61931bf1df28dd15e60ef.png" />
+  <h1 id='HomeHeader'>AirBnb Host Revenue Prediction
+</h1>
+  <p>
+    What you want to know as a Airbnb host.
+
+    <div id="controls">
+            <div>
+                <label>price per night</label>
+                <input id="price" type="number" value="150" />
+            </div>
+            <div>
+                <label>cleaning fee</label>
+                <input id="cleaning_fee" type="number" value="50" />
+            </div>
+            <div>
+                <label>bedrooms</label>
+                <input id="bedrooms" type="number" value='1' />
+            </div>
+            <div>
+                <label>room type</label>
+                <input id="room_type" type="string" value='Entire home/apt' />
+            </div>
+            <div>
+                <label>property type</label>
+                <input id="property_type" type="string" value="Apartment" />
+
+            <div>
+                <button id="inference">Predict Revenue</button>
+            </div>
+            <div>
+                <input id="revenue" type="text" readonly />
+            </div>
+
+        </div>
+        <!-- 'bedrooms': {8: 3.0},
+        'cleaning_fee': {8: '$50.00'},
+        'extra_people': {8: '$0.00'},
+        'host_response_time': {8: 'within an hour'},
+        'host_since': {8: pd.to_datetime('2018-01-01')},
+        'instant_bookable': {8: 't'},
+        'last_scraped': {8: last_scraped},
+        'latitude': {8: latitude},
+        'longitude': {8: longitude},
+        'maximum_nights': {8: 1125},
+        'neighbourhood_cleansed': {8: neighbourhood_cleansed},
+        'number_of_reviews': {8: number_of_reviews},
+        'price': {8: '$195.00'},
+        'property_type': {8: 'Apartment'},
+        'review_scores_rating': {8: 99.0},
+        'reviews_per_month': {8: reviews_per_month},
+        'room_type': {8: 'Entire home/apt'}} -->
+
+
+
+  </p>
+  <ul>
+    <li>
+        <a href="/price">Price</a>
+    </li>
+      <li>
+        this is a list.
+      </li>
+      <li>
+        this is another list.
+      </li>
+  </ul>
+ 
+  <span>
+    Here is a span
+  </span>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.35.2/plotly.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/static/home.js"></script>
+</body>
+</html>

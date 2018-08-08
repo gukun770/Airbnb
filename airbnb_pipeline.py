@@ -50,32 +50,32 @@ list_to_drop2 = list(set(['beds',
 preselect_cols = list(set([
         # 'id',
         'price',
-        'reviews_per_month',
-        'number_of_reviews',
+        # 'reviews_per_month',
+        # 'number_of_reviews',
         # 'last_review',
-        'host_since',
+        # 'host_since',
         # 'minimum_nights',
         'room_type',
-        'host_response_time',
+        # 'host_response_time',
         # 'host_is_superhost',
-        'review_scores_rating',
+        # 'review_scores_rating',
         'property_type',
-        'neighbourhood_cleansed',
+        # 'neighbourhood_cleansed',
         'bedrooms',
         # 'calculated_host_listings_count',
         # 'host_identity_verified',
         'cleaning_fee',
-        'last_scraped',
-        'latitude',
-        'longitude',
+        # 'last_scraped',
+        # 'latitude',
+        # 'longitude',
         # 'beds',
         # 'cancellation_policy',
         # 'access',
         # 'description',
         # 'notes','transit',
-        'instant_bookable',
-        'extra_people',
-        'maximum_nights',
+        # 'instant_bookable',
+        # 'extra_people',
+        # 'maximum_nights',
         # 'house_rules',
         ]))
 class PreselectColumns(BaseEstimator, TransformerMixin):
@@ -97,8 +97,12 @@ class DataType(BaseEstimator, TransformerMixin):
         df = X.copy()
         # Clean price label: remove the dollar sign and comma.
         df.price=df.price.str.replace(r'[$,]','').astype(float)
-        df.cleaning_fee=df.cleaning_fee.str.replace(r'[$,]','').astype(float)
-        df.extra_people=df.extra_people.str.replace(r'[$,]','').astype(float)
+
+        if 'cleaning_fee' in df.columns:
+            df.cleaning_fee=df.cleaning_fee.str.replace(r'[$,]','').astype(float)
+
+        if 'extra_people' in df.columns:
+            df.extra_people=df.extra_people.str.replace(r'[$,]','').astype(float)
 
         # Convert 0 bed and 0 bedrooms to 1.
         if 'bedrooms' in df.columns:
@@ -114,10 +118,11 @@ class DataType(BaseEstimator, TransformerMixin):
         df.loc[mask, 'property_type'] = 'others'
 
         # Convert unimportant neigbourhood to 'Other Neighbourhoods'
-        neighbourhood_cleansed = ['Castro/Upper Market','Inner Richmond','Downtown/Civic Center','Haight Ashbury',
-        'Mission','Outer Richmond','South of Market','Nob Hill','Western Addition','Ocean View','Excelsior']
-        mask = ~df.neighbourhood_cleansed.isin(neighbourhood_cleansed)
-        df.loc[mask, 'neighbourhood_cleansed'] = 'Other Neighbourhoods'
+        if 'neighbourhood_cleansed' in df.columns:
+            neighbourhood_cleansed = ['Castro/Upper Market','Inner Richmond','Downtown/Civic Center','Haight Ashbury',
+            'Mission','Outer Richmond','South of Market','Nob Hill','Western Addition','Ocean View','Excelsior']
+            mask = ~df.neighbourhood_cleansed.isin(neighbourhood_cleansed)
+            df.loc[mask, 'neighbourhood_cleansed'] = 'Other Neighbourhoods'
 
         # transform t/f column to 1 and 0
         for columns_t_f in ['host_is_superhost','instant_bookable','host_identity_verified']:
@@ -146,13 +151,16 @@ class FeatureEnginner(BaseEstimator, TransformerMixin):
     def transform(self, X):
         df_new = X.copy()
         # Feature engineering - month, year
-        df_new['month_scraped'] =  df_new['last_scraped'].dt.month.astype(str)
-        df_new['year_scraped'] =  df_new['last_scraped'].dt.year.astype(str)
+        if 'last_scraped' in df_new.columns:
+            df_new['month_scraped'] =  df_new['last_scraped'].dt.month.astype(str)
+        if 'last_scraped' in df_new.columns:
+            df_new['year_scraped'] =  df_new['last_scraped'].dt.year.astype(str)
 
         # Feature engineering - total_hosting_days, price_per_bedroom, price_per_bed
-        df_new['total_hosting_days']=df_new['last_scraped'] - df_new['host_since']
-        df_new['total_hosting_days']=df_new['total_hosting_days'].apply(lambda row: row.days)
-        df_new.total_hosting_days = df_new.total_hosting_days.fillna(0)
+        if 'host_since' in df_new.columns and 'last_scraped' in df_new.columns:
+            df_new['total_hosting_days']=df_new['last_scraped'] - df_new['host_since']
+            df_new['total_hosting_days']=df_new['total_hosting_days'].apply(lambda row: row.days)
+            df_new.total_hosting_days = df_new.total_hosting_days.fillna(0)
         df_new['price_per_bedroom']=df_new['price']/df_new['bedrooms']
         if 'beds' in df_new.columns:
             df_new['price_per_bed']=df_new['price']/df_new['beds']
@@ -175,7 +183,8 @@ class FeatureEnginner(BaseEstimator, TransformerMixin):
 
         # Feature engineering - Compute distance from middle
         center = np.array([37.762835, -122.434239])
-        df_new['distance'] = df_new[['latitude', 'longitude']].apply(lambda row: np.linalg.norm(row - center), axis=1)
+        if 'latitiude' in df_new.columns and 'longitude' in df_new.columns:
+            df_new['distance'] = df_new[['latitude', 'longitude']].apply(lambda row: np.linalg.norm(row - center), axis=1)
 
         # df_new['holiday'] = df_new['last_scraped'].apply(
         #     lambda x: F.add_holidays(x, holidays))
@@ -245,9 +254,9 @@ class Getdummies(BaseEstimator, TransformerMixin):
         df = self.X_train_transpose.join(df.T, how='left').T
         # print('{}'.format(self.counter))
         # self.counter += 1
-        # if df.isnull().sum().sum() > 0:
-        #     nan_col = df.apply(lambda x:x.isnull().sum())
-        #     print(nan_col[nan_col>0])
+        if df.isnull().sum().sum() > 0:
+            nan_col = df.apply(lambda x:x.isnull().sum())
+            print(nan_col[nan_col>0])
         df = df.fillna(0)
         df = df.iloc[1:,:]
         self.X_test = df.copy()
