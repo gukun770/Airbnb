@@ -4,7 +4,7 @@
 <!-- What the page is called in the tab bar  -->
 <!-- We will add out stylsheet here later -->
 <head>
-    <link rel="stylesheet" href="/static/home.css" />
+    <link rel="stylesheet" href="/static/price.css" />
     <title>Price</title>
 </head>
 <!-- Put some text on the page -->
@@ -19,6 +19,44 @@
     Here is a span
   </span>
 
-  
+  <header>header area</header>
+
+  <div class="scrollmenu">
+      <a href="#home">Home</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+      ...
+    </div>
+
+    <table style="width:100%">
+        <tr>
+            <th id="renvenue" type="text">Firstname</th>
+            
+            <th>Age</th>
+        </tr>
+        <tr>
+            <td>Jill</td>
+            <td>Smith</td> 
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>Eve</td>
+            <td>Jackson</td> 
+            <td>94</td>
+        </tr>
+    </table>
+
+    <div>
+        <button id="inference">Predict Revenue</button>
+    </div>
+
+    <div id="revenue">
+        <input id="revenue" type="text" readonly />
+    </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.35.2/plotly.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/static/price.js"></script>
+
 </body>
 </html>

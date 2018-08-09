@@ -6,9 +6,12 @@ $(document).ready(function(){
 
         const price = parseFloat($('#price').val());
         const cleaning_fee = parseFloat($('#cleaning_fee').val());
+        const guests_included = parseFloat($('#guests_included').val());
         const bedrooms = parseFloat($('#bedrooms').val());
         const room_type = ($('#room_type').val());
         const property_type = ($('#property_type').val());
+        const address = ($('#address').val());
+
 
         const data = {
             price,
@@ -16,6 +19,9 @@ $(document).ready(function(){
             bedrooms,
             room_type,
             property_type,
+            address,
+            guests_included
+
           }
         console.log(data)
 

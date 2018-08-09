@@ -56,18 +56,19 @@ preselect_cols = list(set([
         # 'host_since',
         # 'minimum_nights',
         'room_type',
+        'guests_included',
         # 'host_response_time',
         # 'host_is_superhost',
         # 'review_scores_rating',
         'property_type',
-        # 'neighbourhood_cleansed',
+        'neighbourhood_cleansed',
         'bedrooms',
         # 'calculated_host_listings_count',
         # 'host_identity_verified',
         'cleaning_fee',
         # 'last_scraped',
-        # 'latitude',
-        # 'longitude',
+        'latitude',
+        'longitude',
         # 'beds',
         # 'cancellation_policy',
         # 'access',
@@ -198,24 +199,25 @@ class PricePerBedroom(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y):
         df = X.copy()
-        self.mean_train_df_with_month = df.groupby(['neighbourhood_cleansed','month_scraped'])[['price_per_bedroom']].mean()
+        if 'month_scraped' in df.columns:
+            self.mean_train_df_with_month = df.groupby(['neighbourhood_cleansed','month_scraped'])[['price_per_bedroom']].mean()
         self.mean_train_df_without_month = df.groupby('neighbourhood_cleansed')[['price_per_bedroom']].mean()
         return self
 
     def transform(self, X):
         df = X.copy()
-        df = df.join(self.mean_train_df_with_month, on=['neighbourhood_cleansed', 'month_scraped'],
-                    how='left', rsuffix='_per_neig_month')
-
-        df['diff_price_per_bedroom_hood_month'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neig_month']
-        df['diff_price_per_bedroom_hood_month'] = df['diff_price_per_bedroom_hood_month'].fillna(df['diff_price_per_bedroom_hood_month'].mean())
+        if 'month_scraped' in df.columns:
+            df = df.join(self.mean_train_df_with_month, on=['neighbourhood_cleansed', 'month_scraped'],
+                        how='left', rsuffix='_per_neig_month')
+            df['diff_price_per_bedroom_hood_month'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neig_month']
+            df['diff_price_per_bedroom_hood_month'] = df['diff_price_per_bedroom_hood_month'].fillna(df['diff_price_per_bedroom_hood_month'].mean())
+            df.drop('price_per_bedroom_per_neig_month', axis=1, inplace=True)
 
         df = df.join(self.mean_train_df_without_month, on='neighbourhood_cleansed',
                     how='left', rsuffix='_per_neighbourhood')
         df['diff_price_per_bedroom_hood'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neighbourhood']
         df['diff_price_per_bedroom_hood'] = df['diff_price_per_bedroom_hood'].fillna(df['diff_price_per_bedroom_hood'].mean())
 
-        df.drop('price_per_bedroom_per_neig_month', axis=1, inplace=True)
         df.drop('price_per_bedroom_per_neighbourhood', axis=1, inplace=True)
         return df
 

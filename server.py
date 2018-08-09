@@ -2,6 +2,9 @@
 from flask import Flask,render_template, request,jsonify,Response
 import pandas as pd
 import pickle
+import json
+import requests
+import datetime
 
 
 #Create the app object that will route our calls
@@ -20,23 +23,43 @@ model = pickle.load(open('rf.pkl','rb'))
 def inference():
     req = request.get_json()
     print(req)
-    # price,room_type,property_type,bedrooms,cleaning_fee = req['price'],req['room_type'],req['property_type'],req['bedrooms'],req['cleaning_fee']
+
+    address = req['address']
+
+    search_query = "https://maps.googleapis.com/maps/api/geocode/json?address="
+    search_query += address + '&key=' + 'keys'
+
+    response = requests.get(search_query)
+    result = json.loads(response.text)
+
+
+    latitude = result['results'][0]['geometry']['location']['lat']
+    longitude = result['results'][0]['geometry']['location']['lng']
+    neighbourhood_cleansed = result['results'][0]['address_components'][2]['short_name']
 
     new_data = {'bedrooms': [int(req['bedrooms'])],
  'cleaning_fee':  [str(req['cleaning_fee'])],
  'price': [str(req['price'])],
  'property_type': [str(req['property_type'])],
- 'room_type': [str(req['room_type'])]}
-    print(pd.DataFrame(new_data))
+ 'room_type': [str(req['room_type'])],
+ 'latitude':[float(latitude)],
+ 'longitude':[float(longitude)],
+ 'neighbourhood_cleansed':[neighbourhood_cleansed],
+ 'guests_included':[int(req['guests_included'])]
+ }
 
     prediction = model.predict(pd.DataFrame(new_data))
     return jsonify({
         'bedrooms': req['bedrooms'],
+        'guests_included':req['guests_included'],
         'cleaning_fee': req['cleaning_fee'],
         'price': req['price'],
         'property_type': req['property_type'],
         'room_type': req['room_type'],
-        'prediction':list(prediction)[0]
+        'latitude': latitude,
+        'longitude': longitude,
+        'neighbourhood_cleansed': neighbourhood_cleansed,
+        'prediction':prediction[0]
 })
 
 

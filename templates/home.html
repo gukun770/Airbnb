@@ -2,11 +2,16 @@
 <!-- What the page is called in the tab bar  -->
 <!-- We will add out stylsheet here later -->
 <head>
-    <link rel="stylesheet" href="/static/home.css" />
+
+        <link rel="stylesheet" media="screen" href="//netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/static/home.css" />
+
     <title> Home Page</title>
 </head>
 <!-- Put some text on the page -->
 <body>
+        
         <img src="https://a0.muscache.com/airbnb/static/logos/belo-200x200-4d851c5b28f61931bf1df28dd15e60ef.png" />
   <h1 id='HomeHeader'>AirBnb Host Revenue Prediction
 </h1>
@@ -15,32 +20,66 @@
 
     <div id="controls">
             <div>
+                <label>Address</label>
+                <input id="address" type="string" value='44 Tehama St, San Francisco, CA 94105' />
+                </div>
+        <div>
                 <label>price per night</label>
-                <input id="price" type="number" value="150" />
+                <input id="price" type="string" value="150" />
             </div>
             <div>
                 <label>cleaning fee</label>
-                <input id="cleaning_fee" type="number" value="50" />
+                <input id="cleaning_fee" type="string" value="50" />
             </div>
             <div>
                 <label>bedrooms</label>
                 <input id="bedrooms" type="number" value='1' />
             </div>
             <div>
+                <label>Guests number</label>
+                <input id="guests_included" type="number" value='2' />
+            </div>
+
+
+
+
+            <div>
                 <label>room type</label>
-                <input id="room_type" type="string" value='Entire home/apt' />
+                <select id="room_type" type="string">
+                        <option value="Entire home/apt">Entire home/apt</option>
+                        <option value="Private room">Private room</option>
+                        <option value="Shared room">Shared room</option>
+                </select>
             </div>
             <div>
                 <label>property type</label>
-                <input id="property_type" type="string" value="Apartment" />
+                <select id="property_type" type="string">
+                        <option value="Apartment">Apartment</option>
+                        <option value="House">House</option>
+                        <option value="others">others</option>
+                </select>
 
             <div>
                 <button id="inference">Predict Revenue</button>
             </div>
             <div>
                 <input id="revenue" type="text" readonly />
-            </div>
+                        <table style="width:100%">
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Revenue</th>
+                                </tr>
+                                <tr>
+                                    <td>Jan</td>
 
+                                    <td>50</td>
+                                </tr>
+                                <tr>
+                                    <td>Feb</td>
+                                    <td>94</td>
+                                </tr>
+                            </table>
+            </div>
         </div>
         <!-- 'bedrooms': {8: 3.0},
         'cleaning_fee': {8: '$50.00'},
@@ -74,12 +113,13 @@
         this is another list.
       </li>
   </ul>
- 
+
   <span>
     Here is a span
   </span>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.35.2/plotly.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="/static/home.js"></script>
+
 </body>
 </html>
