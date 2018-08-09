@@ -5,6 +5,7 @@ import pickle
 import json
 import requests
 import datetime
+import keys
 
 
 #Create the app object that will route our calls
@@ -27,7 +28,7 @@ def inference():
     address = req['address']
 
     search_query = "https://maps.googleapis.com/maps/api/geocode/json?address="
-    search_query += address + '&key=' + 'keys'
+    search_query += address + '&key=' + keys
 
     response = requests.get(search_query)
     result = json.loads(response.text)
