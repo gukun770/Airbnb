@@ -5,7 +5,8 @@ import pickle
 import json
 import requests
 import datetime
-import keys
+
+keys = json.load('keys.json')['key']
 
 
 #Create the app object that will route our calls
