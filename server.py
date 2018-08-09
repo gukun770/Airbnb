@@ -6,7 +6,9 @@ import json
 import requests
 import datetime
 
-keys = json.load('keys.json')['key']
+with open('keys.json') as f:
+    my_keys = json.load(f)
+keys = my_keys['key']
 
 
 #Create the app object that will route our calls
