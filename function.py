@@ -266,3 +266,68 @@ def my_train_test_split(df, date):
     y_test = y_test.values
 
     return X_train, X_test, y_train, y_test
+
+def precleaning(X):
+    df = X.copy()
+
+    # clean price
+    df.price=df.price.str.replace(r'[$,]','').astype(float)
+
+    # clean zipcode
+    df.zipcode = pd.to_numeric(df.zipcode,errors='coerce')
+    df = df[df.zipcode.notnull()]
+    df.zipcode = df.zipcode.astype(int)
+    df.zipcode = df.zipcode.astype(str)
+    mask = df.zipcode.isin(['94306','94015','60614','94080','94066','94129','94607','94005','94106','95014'])
+    df = df[~mask]
+
+    if 'cleaning_fee' in df.columns:
+        df.cleaning_fee=df.cleaning_fee.str.replace(r'[$,]','').astype(float)
+
+    if 'extra_people' in df.columns:
+        df.extra_people=df.extra_people.str.replace(r'[$,]','').astype(float)
+
+    # Convert 0 bed and 0 bedrooms to 1.
+    if 'bedrooms' in df.columns:
+        df.loc[df['bedrooms']==0,'bedrooms'] = 1
+        df.bedrooms = df.bedrooms.fillna(1)
+    if 'beds' in df.columns:
+        df.loc[df['beds']==0,'beds'] = 1
+        df.beds = df.beds.fillna(1)
+
+    # Convert minor cases for property type to 'other property types'
+    if 'property_type' in df.columns:
+        mask = df.property_type.isin(['Condominium','Condominium','Guest suite','Townhouse'])
+        df.loc[mask,'property_type'] = 'Apartment'
+        mask = df.property_type.isin(['Apartment','House'])
+        df.loc[~mask, 'property_type'] = 'Others'
+
+    # Convert unimportant neigbourhood to 'Other Neighbourhoods'
+    # if 'neighbourhood_cleansed' in df.columns:
+    #     neighbourhood_cleansed = ['Castro/Upper Market','Inner Richmond','Downtown/Civic Center','Haight Ashbury',
+    #     'Mission','Outer Richmond','South of Market','Nob Hill','Western Addition','Ocean View','Excelsior']
+    #     mask = ~df.neighbourhood_cleansed.isin(neighbourhood_cleansed)
+    #     df.loc[mask, 'neighbourhood_cleansed'] = 'Other Neighbourhoods'
+
+    # transform t/f column to 1 and 0
+    for columns_t_f in ['host_is_superhost','instant_bookable','host_identity_verified']:
+        if columns_t_f in df.columns:
+            df[columns_t_f] = df[columns_t_f].replace({'f':0,'t':1})
+
+    # deal with nan
+    if 'cleaning_fee' in df.columns:
+        df.cleaning_fee = df.cleaning_fee.fillna(0)
+    if 'reviews_per_month' in df.columns:
+        df.reviews_per_month = df.reviews_per_month.fillna(0)
+    if 'review_scores_rating' in df.columns:
+        df.review_scores_rating = df.review_scores_rating.fillna(0)
+    if 'host_response_time' in df.columns:
+        df.host_response_time = df.host_response_time.fillna('unclear')
+    if 'host_is_superhost' in df.columns:
+        df.host_is_superhost = df.host_is_superhost.fillna(0)
+    if 'host_identity_verified' in df.columns:
+        df.host_identity_verified = df.host_identity_verified.fillna(0)
+    # df.to_csv('data/listings/listings.csv')
+
+    return df
+

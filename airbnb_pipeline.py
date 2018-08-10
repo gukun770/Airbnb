@@ -15,10 +15,13 @@ list_to_drop1 = list(set([
             'last120','last180','last_scraped',
             'host_since',
             # 'number_of_reviews',
-            'reviews_per_month','notes',
+            'reviews_per_month',
+            'notes',
             'access','index','house_rules',
             'description','transit',
-            'id'
+            'id',
+            'zipcode',
+            'property_type',
             ]))
 list_to_drop2 = list(set(['beds',
  'host_identity_verified',
@@ -46,6 +49,14 @@ list_to_drop2 = list(set(['beds',
  'neighbourhood_cleansed_Bernal Heights',
  'host_response_time_unclear',
  'holiday_César Chávez Day',
+ 'neighbourhood_cleansed_Other Neighbourhoods',
+#  'property_type_House',
+#  'property_type_Apartment',
+ 'bedrooms',
+ 'neighbourhood_cleansed_Mission',
+ 'room_type_Shared room',
+ 'property_type_others',
+ 'price_per_bedroom',
  ]))
 preselect_cols = list(set([
         # 'id',
@@ -61,7 +72,7 @@ preselect_cols = list(set([
         # 'host_is_superhost',
         # 'review_scores_rating',
         'property_type',
-        'neighbourhood_cleansed',
+        # 'neighbourhood_cleansed',
         'bedrooms',
         # 'calculated_host_listings_count',
         # 'host_identity_verified',
@@ -73,11 +84,13 @@ preselect_cols = list(set([
         # 'cancellation_policy',
         # 'access',
         # 'description',
-        # 'notes','transit',
+        # 'notes',
+        # 'transit',
         # 'instant_bookable',
         # 'extra_people',
         # 'maximum_nights',
         # 'house_rules',
+        'zipcode',
         ]))
 class PreselectColumns(BaseEstimator, TransformerMixin):
 
@@ -114,9 +127,11 @@ class DataType(BaseEstimator, TransformerMixin):
             df.beds = df.beds.fillna(1)
 
         # Convert minor cases for property type to 'other property types'
-        property_types = ['House','Apartment','Condominium','Loft']
-        mask = ~df.property_type.isin(property_types)
-        df.loc[mask, 'property_type'] = 'others'
+        if 'property_types' in df.columns:
+            mask = df.property_type.isin(['Condominium','Condominium','Guest suite','Townhouse'])
+            df.loc[mask,'property_type'] = 'Apartment'
+            mask = df.property_type.isin(['Apartment','House'])
+            df.loc[~mask, 'property_type'] = 'Others'
 
         # Convert unimportant neigbourhood to 'Other Neighbourhoods'
         if 'neighbourhood_cleansed' in df.columns:
@@ -157,14 +172,24 @@ class FeatureEnginner(BaseEstimator, TransformerMixin):
         if 'last_scraped' in df_new.columns:
             df_new['year_scraped'] =  df_new['last_scraped'].dt.year.astype(str)
 
+        # # Compute price per person
+        if 'guests_included' in df_new.columns:
+            mask = df_new['guests_included'] == 0
+            df_new.loc[mask, 'guests_included'] = 1
+            df_new['price_per_person'] = df_new['price'] / df_new['guests_included']
+
         # Feature engineering - total_hosting_days, price_per_bedroom, price_per_bed
         if 'host_since' in df_new.columns and 'last_scraped' in df_new.columns:
             df_new['total_hosting_days']=df_new['last_scraped'] - df_new['host_since']
             df_new['total_hosting_days']=df_new['total_hosting_days'].apply(lambda row: row.days)
             df_new.total_hosting_days = df_new.total_hosting_days.fillna(0)
+
         df_new['price_per_bedroom']=df_new['price']/df_new['bedrooms']
         if 'beds' in df_new.columns:
             df_new['price_per_bed']=df_new['price']/df_new['beds']
+
+        # Cleaning fee per person
+        df_new['cleaning_fee_person'] = df_new['cleaning_fee'] / df_new['guests_included']
 
         # Feature engineering - Add the number of words of house rules, access, transit, description
         # len_house_rules, len_access, len_transit, len_description
@@ -184,36 +209,78 @@ class FeatureEnginner(BaseEstimator, TransformerMixin):
 
         # Feature engineering - Compute distance from middle
         center = np.array([37.762835, -122.434239])
-        if 'latitiude' in df_new.columns and 'longitude' in df_new.columns:
+        if 'latitude' in df_new.columns and 'longitude' in df_new.columns:
             df_new['distance'] = df_new[['latitude', 'longitude']].apply(lambda row: np.linalg.norm(row - center), axis=1)
 
         # df_new['holiday'] = df_new['last_scraped'].apply(
         #     lambda x: F.add_holidays(x, holidays))
         return df_new
 
+class Interaction(BaseEstimator, TransformerMixin):
+    def fit(self, X, y):
+        return self
+    def transform(self, X):
+        df = X.copy()
+        df['price_entire_home'] = df['price'] * df['room_type_Entire home/apt']
+        # df['price_private_room'] = df['price'] * df['room_type_Private room']
+        df['guest_entire_home'] = df['guests_included'] * df['room_type_Entire home/apt']
+        df['guest_private_room'] = df['guests_included'] * df['room_type_Private room']
+        df['cleanfee_entire_home'] = df['cleaning_fee'] * df['room_type_Entire home/apt']
+        return df
+
+# class PricePerBedroom(BaseEstimator, TransformerMixin):
+
+#     def __init__(self):
+#         self.mean_train_df_with_month = None
+#         self.mean_train_df_without_month = None
+
+#     def fit(self, X, y):
+#         df = X.copy()
+#         if 'month_scraped' in df.columns:
+#             self.mean_train_df_with_month = df.groupby(['neighbourhood_cleansed','month_scraped'])[['price_per_bedroom']].mean()
+#         self.mean_train_df_without_month = df.groupby('neighbourhood_cleansed')[['price_per_bedroom']].mean()
+#         return self
+
+#     def transform(self, X):
+#         df = X.copy()
+#         if 'month_scraped' in df.columns:
+#             df = df.join(self.mean_train_df_with_month, on=['neighbourhood_cleansed', 'month_scraped'],
+#                         how='left', rsuffix='_per_neig_month')
+#             df['diff_price_per_bedroom_hood_month'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neig_month']
+#             df['diff_price_per_bedroom_hood_month'] = df['diff_price_per_bedroom_hood_month'].fillna(df['diff_price_per_bedroom_hood_month'].mean())
+#             df.drop('price_per_bedroom_per_neig_month', axis=1, inplace=True)
+
+#         df = df.join(self.mean_train_df_without_month, on='neighbourhood_cleansed',
+#                     how='left', rsuffix='_per_neighbourhood')
+#         df['diff_price_per_bedroom_hood'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neighbourhood']
+#         df['diff_price_per_bedroom_hood'] = df['diff_price_per_bedroom_hood'].fillna(df['diff_price_per_bedroom_hood'].mean())
+
+#         df.drop('price_per_bedroom_per_neighbourhood', axis=1, inplace=True)
+#         return df
+
 class PricePerBedroom(BaseEstimator, TransformerMixin):
 
     def __init__(self):
-        self.mean_train_df_with_month = None
+        # self.mean_train_df_with_month = None
         self.mean_train_df_without_month = None
 
     def fit(self, X, y):
         df = X.copy()
-        if 'month_scraped' in df.columns:
-            self.mean_train_df_with_month = df.groupby(['neighbourhood_cleansed','month_scraped'])[['price_per_bedroom']].mean()
-        self.mean_train_df_without_month = df.groupby('neighbourhood_cleansed')[['price_per_bedroom']].mean()
+        # if 'month_scraped' in df.columns:
+        #     self.mean_train_df_with_month = df.groupby(['zipcode','month_scraped'])[['price_per_bedroom']].mean()
+        self.mean_train_df_without_month = df.groupby('zipcode')[['price_per_bedroom']].mean()
         return self
 
     def transform(self, X):
         df = X.copy()
-        if 'month_scraped' in df.columns:
-            df = df.join(self.mean_train_df_with_month, on=['neighbourhood_cleansed', 'month_scraped'],
-                        how='left', rsuffix='_per_neig_month')
-            df['diff_price_per_bedroom_hood_month'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neig_month']
-            df['diff_price_per_bedroom_hood_month'] = df['diff_price_per_bedroom_hood_month'].fillna(df['diff_price_per_bedroom_hood_month'].mean())
-            df.drop('price_per_bedroom_per_neig_month', axis=1, inplace=True)
+        # if 'month_scraped' in df.columns:
+        #     df = df.join(self.mean_train_df_with_month, on=['zipcode', 'month_scraped'],
+        #                 how='left', rsuffix='_per_neig_month')
+        #     df['diff_price_per_bedroom_hood_month'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neig_month']
+        #     df['diff_price_per_bedroom_hood_month'] = df['diff_price_per_bedroom_hood_month'].fillna(df['diff_price_per_bedroom_hood_month'].mean())
+        #     df.drop('price_per_bedroom_per_neig_month', axis=1, inplace=True)
 
-        df = df.join(self.mean_train_df_without_month, on='neighbourhood_cleansed',
+        df = df.join(self.mean_train_df_without_month, on='zipcode',
                     how='left', rsuffix='_per_neighbourhood')
         df['diff_price_per_bedroom_hood'] = df['price_per_bedroom'] - df['price_per_bedroom_per_neighbourhood']
         df['diff_price_per_bedroom_hood'] = df['diff_price_per_bedroom_hood'].fillna(df['diff_price_per_bedroom_hood'].mean())
