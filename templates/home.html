@@ -23,10 +23,7 @@
                 <label>Address</label>
                 <input id="address" type="string" value='44 Tehama St, San Francisco, CA 94105' />
                 </div>
-        <div>
-                <label>price per night</label>
-                <input id="price" type="string" value="150" />
-            </div>
+   
             <div>
                 <label>cleaning fee</label>
                 <input id="cleaning_fee" type="string" value="50" />
@@ -56,29 +53,18 @@
                 <select id="property_type" type="string">
                         <option value="Apartment">Apartment</option>
                         <option value="House">House</option>
-                        <option value="others">others</option>
+                        <option value="Others">Others</option>
                 </select>
 
             <div>
                 <button id="inference">Predict Revenue</button>
             </div>
             <div>
+                <label>price per night</label>
+                <input id="price" type="string" readonly />
+            </div>
+            <div>
                 <input id="revenue" type="text" readonly />
-                        <table style="width:100%">
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Revenue</th>
-                                </tr>
-                                <tr>
-                                    <td>Jan</td>
-
-                                    <td>50</td>
-                                </tr>
-                                <tr>
-                                    <td>Feb</td>
-                                    <td>94</td>
-                                </tr>
-                            </table>
             </div>
         </div>
         <!-- 'bedrooms': {8: 3.0},

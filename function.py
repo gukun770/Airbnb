@@ -327,7 +327,9 @@ def precleaning(X):
         df.host_is_superhost = df.host_is_superhost.fillna(0)
     if 'host_identity_verified' in df.columns:
         df.host_identity_verified = df.host_identity_verified.fillna(0)
-    # df.to_csv('data/listings/listings.csv')
+
+        
+    df.to_csv('data/listings/listings.csv')
 
     return df
 

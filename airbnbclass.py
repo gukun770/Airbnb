@@ -169,9 +169,11 @@ class Airbnb:
         nb_lost2 = df.shape[0] - df_new.shape[0] - nb_lost1
         print('FIlter 2 : {}, i.e.{:.2f}% listings removed.\n'.format(nb_lost2, nb_lost2/df.shape[0]*100 ))
 
-
-        pair_available_nb_reviews = [(0,9, 'last60'),(1,9,'last60'),(2,8,'last60'), (3,7,'last60'), (4,7, 'last60'),
-                            (5,6, 'last60'),(6,5,'last60'),(7,5,'last60'), (8,4,'last60'), (9,3, 'last60'),
+        pair_available_nb_reviews = []
+        # for i in range(31):
+        #     pair_available_nb_reviews.append((i, (30-i)/5*0.7,'last30'))
+        pair_available_nb_reviews = [(0,9, 'last60'),(1,9,'last60'),(2,8,'last60'), (3,8,'last60'), (4,7, 'last60'),
+                            (5,7, 'last60'),(6,6,'last60'),(7,6,'last60'), (8,5,'last60'), (9,4, 'last60'),
                             (10,3, 'last60'),(11,2, 'last60'),(12,2, 'last90'),(13,1, 'last90'),]
         for available,nb_reviews,my_condition in pair_available_nb_reviews:
             df_new = F.select_active_host(df_new, available, nb_reviews,my_condition )
@@ -179,7 +181,7 @@ class Airbnb:
         nb_lost3 = df.shape[0] - df_new.shape[0] - nb_lost1 - nb_lost2
         print('FIlter 3 : {}, i.e.{:.2f}% listings removed.\n'.format(nb_lost3, nb_lost3/df.shape[0]*100 ))
 
-        self.filtered_data = df_new.copy()
+        
         return df_new
 
     def feature_engineer(self,df):
@@ -194,6 +196,9 @@ class Airbnb:
         df_new.total_hosting_days = df_new.total_hosting_days.fillna(0)
         df_new['price_per_bedroom']=df_new['price']/df_new['bedrooms']
         df_new['price_per_bed']=df_new['price']/df_new['beds']
+
+        # Cleaning fee per person
+        df_new['cleaning_fee_person'] = df_new['cleaning_fee'] / df_new['guests_included']
 
         # Feature engineering - Add the number of words of house rules, access, transit, description
         # len_house_rules, len_access, len_transit, len_description

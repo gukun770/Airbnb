@@ -32,6 +32,8 @@ $(document).ready(function(){
         })
         console.log(response)
         $('#revenue').val(response.prediction)
+        console.log(response)
+        $('#price').val(response.price)
 
 
     })
