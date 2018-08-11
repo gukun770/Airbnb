@@ -29,7 +29,6 @@ model_ridge = pickle.load(open('ridge.pkl','rb'))
 @app.route('/inference', methods = ['POST'])
 def inference():
     req = request.get_json()
-    print(req)
 
     address = req['address']
 
@@ -54,27 +53,31 @@ def inference():
         if selected.shape[0] >= 5:
             knn = KNeighborsRegressor(n_neighbors=5)
             knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
-            result = knn_model.predict(lat_lon)
+            price_pred = knn_model.predict(lat_lon)
         else: 
             selected = df[condition_bedrooms & condition_type]
             if selected.shape[0] >= 5:
                 knn = KNeighborsRegressor(n_neighbors=5)
                 knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
-                result = knn_model.predict(lat_lon)
-        return result
+                price_pred = knn_model.predict(lat_lon)
+            else:
+                # print(selected.shape)
+                selected = df[condition_bedrooms & condition_type]
+                price_pred = str(np.mean(selected.price))
+        return price_pred
 
     price = get_price(nearest, 
     pd.DataFrame({'latitude': [latitude],'longitude':[longitude]}),
     int(req['bedrooms']),
     str(req['property_type']),
-    str(req['room_type'])
-    ,int(zipcode))
+    str(req['room_type']),
+    int(zipcode))
 
 
     new_data = {'bedrooms': [int(req['bedrooms'])],
  'cleaning_fee':  [float(req['cleaning_fee'])],
  'price': [float(price)],
- 'property_type': [str(req['property_type'])],
+#  'property_type': [str(req['property_type'])],
  'room_type': [str(req['room_type'])],
  'latitude':[float(latitude)],
  'longitude':[float(longitude)],
@@ -83,6 +86,10 @@ def inference():
 
     prediction = np.clip(model_rf.predict(pd.DataFrame(new_data))*0.2 + 
         model_ridge.predict(pd.DataFrame(new_data) )*0.8, 0, 30)
+    occupancy = np.round(30 - prediction,1)
+    monthly_revenue = np.round(occupancy * float(price),1)
+    annual_revenue = np.round(occupancy * float(price) * 12,1)
+    print(monthly_revenue, annual_revenue)
     return jsonify({
         'bedrooms': req['bedrooms'],
         'guests_included':req['guests_included'],
@@ -95,6 +102,9 @@ def inference():
         'neighbourhood_cleansed': neighbourhood_cleansed,
         'prediction':prediction[0],
         'zipcode':zipcode,
+        'occupancy': str(occupancy[0]),
+        'monthly_revenue': monthly_revenue[0],
+        'annual_revenue': annual_revenue[0],
 })
 
 

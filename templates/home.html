@@ -11,25 +11,24 @@
 </head>
 <!-- Put some text on the page -->
 <body>
-        
         <img src="https://a0.muscache.com/airbnb/static/logos/belo-200x200-4d851c5b28f61931bf1df28dd15e60ef.png" />
-  <h1 id='HomeHeader'>AirBnb Host Revenue Prediction
+  <h1 id='HomeHeader'>Airbnb Host Revenue Prediction
 </h1>
   <p>
-    What you want to know as a Airbnb host.
 
     <div id="controls">
+
             <div>
                 <label>Address</label>
                 <input id="address" type="string" value='44 Tehama St, San Francisco, CA 94105' />
                 </div>
    
             <div>
-                <label>cleaning fee</label>
+                <label>Cleaning fee</label>
                 <input id="cleaning_fee" type="string" value="50" />
             </div>
             <div>
-                <label>bedrooms</label>
+                <label>Bedrooms</label>
                 <input id="bedrooms" type="number" value='1' />
             </div>
             <div>
@@ -37,11 +36,8 @@
                 <input id="guests_included" type="number" value='2' />
             </div>
 
-
-
-
             <div>
-                <label>room type</label>
+                <label>Room type</label>
                 <select id="room_type" type="string">
                         <option value="Entire home/apt">Entire home/apt</option>
                         <option value="Private room">Private room</option>
@@ -49,41 +45,38 @@
                 </select>
             </div>
             <div>
-                <label>property type</label>
+                <label>Property type</label>
                 <select id="property_type" type="string">
                         <option value="Apartment">Apartment</option>
                         <option value="House">House</option>
                         <option value="Others">Others</option>
                 </select>
+            </div>
+    </div>
+
+        <div id="predictions">
 
             <div>
                 <button id="inference">Predict Revenue</button>
             </div>
             <div>
-                <label>price per night</label>
+                <label>Price per night</label>
                 <input id="price" type="string" readonly />
             </div>
             <div>
-                <input id="revenue" type="text" readonly />
+                <label>Monthly occupancy</label>
+                <input id="occupancy" type="string" readonly />
+            </div>
+            <div>
+                <label>Monthly revenue</label>
+                <input id="monthly_revenue" type="string" readonly />
+            </div>
+            <div>
+                <label>Annual revenue</label>
+                <input id="annual_revenue" type="string" readonly />
             </div>
         </div>
-        <!-- 'bedrooms': {8: 3.0},
-        'cleaning_fee': {8: '$50.00'},
-        'extra_people': {8: '$0.00'},
-        'host_response_time': {8: 'within an hour'},
-        'host_since': {8: pd.to_datetime('2018-01-01')},
-        'instant_bookable': {8: 't'},
-        'last_scraped': {8: last_scraped},
-        'latitude': {8: latitude},
-        'longitude': {8: longitude},
-        'maximum_nights': {8: 1125},
-        'neighbourhood_cleansed': {8: neighbourhood_cleansed},
-        'number_of_reviews': {8: number_of_reviews},
-        'price': {8: '$195.00'},
-        'property_type': {8: 'Apartment'},
-        'review_scores_rating': {8: 99.0},
-        'reviews_per_month': {8: reviews_per_month},
-        'room_type': {8: 'Entire home/apt'}} -->
+   
 
 
 

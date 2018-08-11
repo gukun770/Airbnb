@@ -1,11 +1,13 @@
 #HomeHeader {  
-    background-color: yellow;  
-    border: 3px dashed green;  
+    background-color: #fd6b5b;  
+    border: 3px dashed #fff;  
     margin: 25px;  
     padding: 25px;
     }
+
+
 body {
-    background-color: #cccccc;
+    background-color: #fd6b5b;
 }
 
 img {
@@ -14,21 +16,29 @@ img {
 }
 
 li {
-    font-family: monospace;
+    font-family: Lato, Arial;
+}
+/* 'Gugi', cursive */
+h1 {
+    font-family: Lato, Arial;
+    color: #fff;
+    background-color: #fd6b5b;
+    border: 3px dashed #fff;
+    margin: 25px;
+    padding: 25px;
+    font-size: 40px;
 }
 
-h1 {
-    font-family: 'Gugi', cursive;
-    color: red;
-    background-color: yellow;
-    border: 3px dashed green;
+ #controls {
+    background-color: #fd6b5b;
+    border: 3px dashed #fff;
     margin: 25px;
     padding: 25px;
 }
-    
-#controls {
-    background-color: yellow;
-    border: 3px dashed green;
+
+#predictions{
+    background-color: #fd6b5b;
+    border: 3px dashed #fff;
     margin: 25px;
     padding: 25px;
 }
@@ -39,15 +49,29 @@ label {
 }
 
 input {
-    background-color: tomato;
+    background-color: #fd6b5b;
     border: 1px solid red;
-    width: 300px;
+    width: 150;
     ;
+    } 
+#inference{
+        background-color: red;
+        margin: 4px;
+        font-size: 14px;
+        color: #fff;
+        border: 2px solid red; 
     }
-
-#revenue{
-    background-color: rgba(248, 243, 187, 0.817);
-    border: 1px solid blue;
-    width: 100%;
-    height: 300px;
+#inference:hover {
+    background-color: white; 
+    color: black;
+    border: 2px solid black;
 }
+#property_type{
+    width:150px;   
+    }
+#room_type{
+    width:150px;   
+    }
+#address{
+    width:300px;   
+    }

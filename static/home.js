@@ -31,9 +31,10 @@ $(document).ready(function(){
             contentType: "application/json"
         })
         console.log(response)
-        $('#revenue').val(response.prediction)
-        console.log(response)
+        $('#occupancy').val(response.occupancy)
         $('#price').val(response.price)
+        $('#monthly_revenue').val(response.monthly_revenue)
+        $('#annual_revenue').val(response.annual_revenue)
 
 
     })
