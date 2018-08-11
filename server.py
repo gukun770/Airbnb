@@ -1,6 +1,7 @@
 # import the nessecary pieces from Flask
 from flask import Flask,render_template, request,jsonify,Response
 from sklearn.neighbors import KNeighborsRegressor 
+from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 import pickle
@@ -72,7 +73,23 @@ def inference():
     str(req['property_type']),
     str(req['room_type']),
     int(zipcode))
+    
 
+    def price_craigslist(bedrooms, zipcode):
+        '''
+        INPUT: string
+        OUTPUT: int
+        '''
+
+        url = "https://sfbay.craigslist.org/search/apa?query={0}&min_bedrooms={1}&max_bedrooms={1}&availabilityMode=0&sale_date=all+dates".format(zipcode, bedrooms)
+
+        html = requests.get(url).text
+        soup = BeautifulSoup(html, 'html.parser')
+        search_count = soup.findAll('span', class_='result-price')
+        price  = np.mean([ float(x.text.strip('$')) for x in search_count[:10]])
+
+        return price
+    craigslist = price_craigslist(req['bedrooms'], zipcode)
 
     new_data = {'bedrooms': [int(req['bedrooms'])],
  'cleaning_fee':  [float(req['cleaning_fee'])],
@@ -102,9 +119,10 @@ def inference():
         'neighbourhood_cleansed': neighbourhood_cleansed,
         'prediction':prediction[0],
         'zipcode':zipcode,
-        'occupancy': str(occupancy[0]),
+        'occupancy': occupancy[0],
         'monthly_revenue': monthly_revenue[0],
         'annual_revenue': annual_revenue[0],
+        'price_craigslist': craigslist,
 })
 
 

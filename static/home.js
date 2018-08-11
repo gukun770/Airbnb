@@ -35,6 +35,8 @@ $(document).ready(function(){
         $('#price').val(response.price)
         $('#monthly_revenue').val(response.monthly_revenue)
         $('#annual_revenue').val(response.annual_revenue)
+        $('#neighbourhood').val(response.neighbourhood_cleansed)
+        $('#craigslist').val(response.price_craigslist)
 
 
     })
