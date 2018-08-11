@@ -50,24 +50,37 @@ def inference():
         condition_bedrooms = nearest.bedrooms == bedrooms
         condition_type = nearest.room_type == room_type
         condition_zipcode = nearest.zipcode == zipcode
-        selected = df[condition_bedrooms & condition_type & condition_zipcode]
+        condition_property = nearest.property_type == property_type
+        selected = df[condition_bedrooms & condition_type & condition_zipcode & condition_property]
+
         if selected.shape[0] >= 5:
+            print('0')
             knn = KNeighborsRegressor(n_neighbors=5)
             knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
             price_pred = knn_model.predict(lat_lon)
         else: 
-            selected = df[condition_bedrooms & condition_type]
+            selected = df[condition_bedrooms & condition_type & condition_zipcode]
             if selected.shape[0] >= 5:
+                print('1')
                 knn = KNeighborsRegressor(n_neighbors=5)
                 knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
                 price_pred = knn_model.predict(lat_lon)
             else:
-                # print(selected.shape)
                 selected = df[condition_bedrooms & condition_type]
-                price_pred = str(np.mean(selected.price))
+                if selected.shape[0] >= 5:
+                    print('2')
+                    knn = KNeighborsRegressor(n_neighbors=5)
+                    knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
+                    price_pred = knn_model.predict(lat_lon)
+                else:
+                    print('3')
+                    selected = df[condition_bedrooms & condition_type]
+
+                    price_pred = np.mean(selected.price)
+
         return price_pred
 
-    price = get_price(nearest, 
+    price = get_price(nearest,
     pd.DataFrame({'latitude': [latitude],'longitude':[longitude]}),
     int(req['bedrooms']),
     str(req['property_type']),
@@ -91,14 +104,17 @@ def inference():
         return price
     craigslist = price_craigslist(req['bedrooms'], zipcode)
 
+    print(zipcode)
+
     new_data = {'bedrooms': [int(req['bedrooms'])],
  'cleaning_fee':  [float(req['cleaning_fee'])],
  'price': [float(price)],
-#  'property_type': [str(req['property_type'])],
+ 'property_type': [str(req['property_type'])],
  'room_type': [str(req['room_type'])],
  'latitude':[float(latitude)],
  'longitude':[float(longitude)],
- 'guests_included':[int(req['guests_included'])]
+ 'guests_included':[int(req['guests_included'])],
+ 'zipcode':[str(zipcode)],
  }
 
     prediction = np.clip(model_rf.predict(pd.DataFrame(new_data))*0.2 + 
@@ -106,7 +122,7 @@ def inference():
     occupancy = np.round(30 - prediction,1)
     monthly_revenue = np.round(occupancy * float(price),1)
     annual_revenue = np.round(occupancy * float(price) * 12,1)
-    print(monthly_revenue, annual_revenue)
+
     return jsonify({
         'bedrooms': req['bedrooms'],
         'guests_included':req['guests_included'],
