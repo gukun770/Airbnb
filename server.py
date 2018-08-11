@@ -1,13 +1,11 @@
 # import the nessecary pieces from Flask
 from flask import Flask,render_template, request,jsonify,Response
-from sklearn.neighbors import KNeighborsRegressor 
-from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 import pickle
 import json
 import requests
-import datetime
+import predict as P
 
 with open('keys.json') as f:
     my_keys = json.load(f)
@@ -46,65 +44,14 @@ def inference():
     zipcode = result['results'][0]['address_components'][7]['long_name']
 
     nearest = pd.read_csv('data/nearest/nearest.csv')
-    def get_price(df, lat_lon, bedrooms, property_type, room_type, zipcode):
-        condition_bedrooms = nearest.bedrooms == bedrooms
-        condition_type = nearest.room_type == room_type
-        condition_zipcode = nearest.zipcode == zipcode
-        condition_property = nearest.property_type == property_type
-        selected = df[condition_bedrooms & condition_type & condition_zipcode & condition_property]
-
-        if selected.shape[0] >= 5:
-            print('0')
-            knn = KNeighborsRegressor(n_neighbors=5)
-            knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
-            price_pred = knn_model.predict(lat_lon)
-        else: 
-            selected = df[condition_bedrooms & condition_type & condition_zipcode]
-            if selected.shape[0] >= 5:
-                print('1')
-                knn = KNeighborsRegressor(n_neighbors=5)
-                knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
-                price_pred = knn_model.predict(lat_lon)
-            else:
-                selected = df[condition_bedrooms & condition_type]
-                if selected.shape[0] >= 5:
-                    print('2')
-                    knn = KNeighborsRegressor(n_neighbors=5)
-                    knn_model = knn.fit(selected[['latitude','longitude']], selected.price)
-                    price_pred = knn_model.predict(lat_lon)
-                else:
-                    print('3')
-                    selected = df[condition_bedrooms & condition_type]
-
-                    price_pred = np.mean(selected.price)
-
-        return price_pred
-
-    price = get_price(nearest,
+    price = P.get_price(nearest,
     pd.DataFrame({'latitude': [latitude],'longitude':[longitude]}),
     int(req['bedrooms']),
     str(req['property_type']),
     str(req['room_type']),
     int(zipcode))
-    
 
-    def price_craigslist(bedrooms, zipcode):
-        '''
-        INPUT: string
-        OUTPUT: int
-        '''
-
-        url = "https://sfbay.craigslist.org/search/apa?query={0}&min_bedrooms={1}&max_bedrooms={1}&availabilityMode=0&sale_date=all+dates".format(zipcode, bedrooms)
-
-        html = requests.get(url).text
-        soup = BeautifulSoup(html, 'html.parser')
-        search_count = soup.findAll('span', class_='result-price')
-        price  = np.mean([ float(x.text.strip('$')) for x in search_count[:10]])
-
-        return price
-    craigslist = price_craigslist(req['bedrooms'], zipcode)
-
-    print(zipcode)
+    craigslist = P.price_craigslist(req['bedrooms'], zipcode)
 
     new_data = {'bedrooms': [int(req['bedrooms'])],
  'cleaning_fee':  [float(req['cleaning_fee'])],
