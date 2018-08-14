@@ -19,9 +19,17 @@ app = Flask(__name__)
 def home():
     return render_template('home.html')
 
-@app.route('/price', methods = ['GET'])
-def price():
-    return render_template('price.html')
+@app.route('/about_model', methods = ['GET'])
+def about_model():
+    return render_template('about_model.html')
+
+@app.route('/about_market_part1', methods = ['GET'])
+def about_market_part1():
+    return render_template('about_market_part1.html')
+
+@app.route('/about_market_part2', methods = ['GET'])
+def about_market_part2():
+    return render_template('about_market_part2.html')
 
 model_rf = pickle.load(open('rf.pkl','rb'))
 model_ridge = pickle.load(open('ridge.pkl','rb'))

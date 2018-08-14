@@ -143,14 +143,15 @@ def permutation_importance(model, X_test, y_test, scorer=accuracy_score):
     return feat_importances
 
 def plot_feature_importance(importance_series, show_n=None):
+    
     if show_n:
-        plt.figure(figsize=(12,6))
+        plt.figure(figsize=(8,6))
         importance_series.sort_values()[-1*show_n:].plot(kind='barh', width=0.35)
     else:
-        plt.figure(figsize=(12,14))
+        plt.figure(figsize=(6,8))
         importance_series.sort_values().plot(kind='barh')
+    plt.title('Permutational Feature Importance')
     plt.tight_layout()
-    plt.show()
 
 
 class text:
@@ -194,7 +195,7 @@ class text:
             stems = [stem(token) for token in tokens if token not in stop_set]
             return stems
 
-        vectorizer_model = Vectorizer(tokenizer=tokenize, max_features=1000,ngram_range=(1,2))
+        vectorizer_model = Vectorizer(tokenizer=tokenize, max_features=1000,ngram_range=(1,1))
         vectorizer_model.fit(contents)
         vocabulary = np.array(vectorizer_model.get_feature_names())
 
@@ -302,12 +303,6 @@ def precleaning(X):
         mask = df.property_type.isin(['Apartment','House'])
         df.loc[~mask, 'property_type'] = 'Others'
 
-    # Convert unimportant neigbourhood to 'Other Neighbourhoods'
-    # if 'neighbourhood_cleansed' in df.columns:
-    #     neighbourhood_cleansed = ['Castro/Upper Market','Inner Richmond','Downtown/Civic Center','Haight Ashbury',
-    #     'Mission','Outer Richmond','South of Market','Nob Hill','Western Addition','Ocean View','Excelsior']
-    #     mask = ~df.neighbourhood_cleansed.isin(neighbourhood_cleansed)
-    #     df.loc[mask, 'neighbourhood_cleansed'] = 'Other Neighbourhoods'
 
     # transform t/f column to 1 and 0
     for columns_t_f in ['host_is_superhost','instant_bookable','host_identity_verified']:
@@ -328,8 +323,8 @@ def precleaning(X):
     if 'host_identity_verified' in df.columns:
         df.host_identity_verified = df.host_identity_verified.fillna(0)
 
-        
-    df.to_csv('data/listings/listings.csv')
+
+    # df.to_csv('data/listings/listings.csv')
 
     return df
 
