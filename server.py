@@ -31,8 +31,6 @@ def about_market_part1():
 def about_market_part2():
     return render_template('about_market_part2.html')
 
-model_rf = pickle.load(open('rf.pkl','rb'))
-model_ridge = pickle.load(open('ridge.pkl','rb'))
 @app.route('/inference', methods = ['POST'])
 def inference():
     req = request.get_json()
@@ -51,7 +49,7 @@ def inference():
     neighbourhood_cleansed = result['results'][0]['address_components'][2]['short_name']
     zipcode = result['results'][0]['address_components'][7]['long_name']
 
-    nearest = pd.read_csv('data/nearest/nearest.csv')
+    
     price = P.get_price(nearest,
     pd.DataFrame({'latitude': [latitude],'longitude':[longitude]}),
     int(req['bedrooms']),
@@ -102,4 +100,7 @@ def inference():
 
 #When run from command line, start the server
 if __name__ == '__main__':
+    model_rf = pickle.load(open('rf.pkl','rb'))
+    model_ridge = pickle.load(open('ridge.pkl','rb'))  
+    nearest = pd.read_csv('data/nearest/nearest.csv')  
     app.run(host ='0.0.0.0', port = 3333, debug = True)
