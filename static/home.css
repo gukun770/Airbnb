@@ -1,5 +1,5 @@
 #HomeHeader {  
-    background-color: #fd6b5b;  
+    background-color: #f5877b;  
     border: 3px dashed #fff;  
     margin: 25px;  
     padding: 25px;
@@ -7,7 +7,7 @@
 
 
 body {
-    background-color: #fd6b5b;
+    background-color: #f5877b;
 }
 
 img {
@@ -22,7 +22,7 @@ li {
 h1 {
     font-family: Lato, Arial;
     color: #fff;
-    background-color: #fd6b5b;
+    background-color: #f5877b;
     border: 3px dashed #fff;
     margin: 25px;
     padding: 25px;
@@ -38,14 +38,14 @@ h1 {
 }
 
  #controls {
-    background-color: #fd6b5b;
+    background-color: #f5877b;
     border: 3px dashed #fff;
     margin: 25px;
     padding: 25px;
 }
 
 #predictions{
-    background-color: #fd6b5b;
+    background-color: #f5877b;
     border: 3px dashed #fff;
     margin: 25px;
     padding: 25px;
@@ -57,7 +57,7 @@ label {
 }
 
 input {
-    background-color: #fd6b5b;
+    background-color: #f5877b;
     border: 1px solid red;
     width: 150;
     ;
