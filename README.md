@@ -1,6 +1,5 @@
-# Airbnb
-capstone project
+# Airbnb Project
 
 ![Project Presentation](img/OnePager.jpg)
 
-Please visit: http://54.85.70.32:3333/
+The Web app link to play with: http://34.229.180.105:3333/
